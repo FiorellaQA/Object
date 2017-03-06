@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>test</title>
+</head>
+<body>
+	<form id="form">
+		<input type="text" name="nombre" id="nombre"/>
+		<input type="text" name="apellido" id="apellido"/>
+		<button type="submit">Enviar</button>
+	</form>
+	<div id="printAll"></div>
+
+	<script type="text/javascript">
+		var personas = [];
+		document.getElementById("form").addEventListener("submit", function(e){
+			e.preventDefault();
+
+			var nombre = document.getElementById("nombre").value.trim();
+			var apellido = document.getElementById("apellido").value.trim();
+
+			var persona = new Persona(nombre, apellido);
+
+			if(persona.validate()){
+				personas.push(persona);	
+			}else{
+				var errors = "";
+				persona.errors.forEach(function(el, i){
+					errors+= el.message + "\n";
+				});
+			alert(errors);
+			}
+			
+			mostrar();
+			unSetValues();
+		});
+
+		function unSetValues(){
+			document.getElementById("nombre").value = "";
+			document.getElementById("apellido").value = "";
+		}
+
+		function mostrar(){
+			var personasPrint = "<table>";
+			personas.forEach(function(e, i){
+				personasPrint+= "<tr><td>" + e.obtener() + "</td></tr>";
+			});
+			document.getElementById("printAll").innerHTML = personasPrint + "</table>";
+		}
+		
+		//Creando objetos:
+		var Error = function(title, message){
+			this.title = title;
+			this.message = message;
+		}	
+
+		var Persona = function(nombre, apellido){
+			this.nombre = nombre;
+			this.apellido = apellido;
+
+			this.errors = [];
+
+			this.validate = function(){
+				if(this.nombre == null || this.nombre == ""){
+					this.errors.push(new Error("nombre", "completa tu nombre"));
+				}
+
+				if(this.apellido == null || this.apellido == ""){
+					this.errors.push(new Error("apellido", "completa tu apellido"));
+				}
+
+				return !this.hasErrors();
+			}
+
+			this.hasErrors = function(){
+				return this.errors.length > 0;
+			}
+
+			this.obtener = function(){
+				return this.capitalize(this.nombre) + " " + this.capitalize(this.apellido);
+			}
+
+			this.capitalize = function(texto){
+				return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+			}
+		}
+	</script>
+</body>
+</html>
